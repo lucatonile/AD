@@ -21,6 +21,12 @@ def birthday_present(P, n, t):
     # Type: Boolean[0..n][0..t]
     A = [[None for i in range(t + 1)] for j in range(n + 1)]
 
+def puta(P, t):
+    if t == 0:
+        return (0)
+    else:
+        return (P[t-1])
+
 def birthday_present_subset(P, n, t):
     '''
     Sig: int[0..n-1], int, int --> int[0..m]
