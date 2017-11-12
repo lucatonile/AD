@@ -18,8 +18,7 @@ def birthday_present(P, n, t):
              birthday_present(P, len(P), 11) = False
     '''
     # Initialize the dynamic programming matrix, A
-    # Type: Boolean[0..n][0..t]
-
+    # Type: Int[0..n][0..t]
     A = [[None for i in range(t + 1)] for j in range(n + 1)]
 
     for i in range(n+1):
@@ -30,12 +29,12 @@ def birthday_present(P, n, t):
     for r in range(1, n+1):
         for c in range(1, t+1):
             #Fel! A[r][c] ska vara weight[r]. sum(P[0:r])?
-            if P[r-1] <= r:
-                A[r][c] = max(P[r-1]+A[r-1][c-P[r-1]], A[r-1][j])
-            else:
+            if P[r-1] > c:
                 A[r][c] = A[r-1][c]
-    print(A)
+            elif P[r-1] <= c:
+                A[r][c] = max(P[r-1]+A[r-1][c-P[r-1]], A[r-1][c])
 
+    return (A[-1][-1]==t)
 def birthday_present_subset(P, n, t):
     '''
     Sig: int[0..n-1], int, int --> int[0..m]
@@ -45,6 +44,35 @@ def birthday_present_subset(P, n, t):
              birthday_present_subset(P, len(P), 299) = [56, 7, 234, 2]
              birthday_present_subset(P, len(P), 11) = []
     '''
+    # Initialize the dynamic programming matrix, A
+    # Type: Int[0..n][0..t]
+    A = [[None for i in range(t + 1)] for j in range(n + 1)]
+
+    for i in range(n+1):
+        A[i][0] = 0
+    for i in range(t+1):
+        A[0][i] = 0
+
+    for r in range(1, n+1):
+        for c in range(1, t+1):
+            #Fel! A[r][c] ska vara weight[r]. sum(P[0:r])?
+            if P[r-1] > c:
+                A[r][c] = A[r-1][c]
+            elif P[r-1] <= c:
+                A[r][c] = max(P[r-1]+A[r-1][c-P[r-1]], A[r-1][c])
+
+    P_ = []
+    if A[-1][-1] == t:
+        c = t+1
+        for r in range(n+1,-1,-1):
+            if A[r-1][c] == 0:
+                break
+            if A[r-1][c] != A[r][c]:
+                P_.append(P[r-1])
+                c = c
+    print(P_)
+    return (P_)
+
 
 class BirthdayPresentTest(unittest.TestCase):
     """Test Suite for birthday present problem
@@ -60,9 +88,9 @@ class BirthdayPresentTest(unittest.TestCase):
         This is a simple sanity check;
         passing is not a guarantee of correctness.
         """
-        P = [1,2,3,4,5,6]
+        P = [1,5,6]
         n = len(P)
-        t = 10
+        t = 11
         #self.assertTrue(birthday_present(P, n, t))
     def test_sat_sanity(self):
         """Sanity Test for birthday_present()
@@ -70,10 +98,10 @@ class BirthdayPresentTest(unittest.TestCase):
         This is a simple sanity check;
         passing is not a guarantee of correctness.
         """
-        P = [2, 32, 234, 35, 12332, 1, 7, 56]
+        P = [2,9,32, 234, 35, 12332, 1, 7, 56]
         n = len(P)
-        t = 11
-        self.assertFalse(birthday_present(P, n, t))
+        t = 33
+        #self.assertTrue(birthday_present(P, n, t))
     def test_sol_sanity(self):
         """Sanity Test for birthday_present_subset()
 
@@ -83,9 +111,9 @@ class BirthdayPresentTest(unittest.TestCase):
         P = [2, 32, 234, 35, 12332, 1, 7, 56]
         n = len(P)
         t = 299
-        #self.assertTrue(birthday_present(P, n, t))
-        #self.assertItemsEqual(birthday_present_subset(P, n, t),
-        #                      [56, 7, 234, 2])
+        self.assertTrue(birthday_present(P, n, t))
+        self.assertItemsEqual(birthday_present_subset(P, n, t),
+                              [56, 7, 234, 2])
 
 
 if __name__ == '__main__':
