@@ -55,7 +55,7 @@ def birthday_present_subset(P, n, t):
 
     for r in range(1, n+1):
         for c in range(1, t+1):
-            #Fel! A[r][c] ska vara weight[r]. sum(P[0:r])?
+            #val[i]=weight[i]
             if P[r-1] > c:
                 A[r][c] = A[r-1][c]
             elif P[r-1] <= c:
@@ -63,14 +63,13 @@ def birthday_present_subset(P, n, t):
 
     P_ = []
     if A[-1][-1] == t:
-        c = t+1
-        for r in range(n+1,-1,-1):
-            if A[r-1][c] == 0:
+        c = t
+        for r in range(n,-1,-1):
+            if r == 0:
                 break
-            if A[r-1][c] != A[r][c]:
+            if A[r-1][c] < A[r][c]:
                 P_.append(P[r-1])
-                c = c
-    print(P_)
+                c = c-P[r-1]
     return (P_)
 
 
