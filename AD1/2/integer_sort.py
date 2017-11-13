@@ -16,7 +16,7 @@ def integer_sort(A, k):
     Example: integer_sort([5, 3, 6, 7, 12, 3, 6, 1, 4, 7]), 12) =
                  [1, 3, 3, 4, 5, 6, 6, 7, 7, 12]
     '''
-# Creates an auxiliary integer array Y [0 : : k] and initialise it with zeros.
+# Creates an auxiliary integer array Y [0..k] and initialise it with zeros.
     Y = [0]*(k+1)
 # Scans A for all indices i: if A[i] = x, then increments Y [x] by 1.
     for i in range(0, len(A)):
