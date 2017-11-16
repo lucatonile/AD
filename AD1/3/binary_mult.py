@@ -3,13 +3,18 @@
 '''
 Assignment 1: Binary Multiplication
 
-Team Number:
-Student Names:
+Team Number: 100
+Student Names: Lucas Herrera, Meriton Bytyqi
 '''
 import unittest
 
-#A and B must be lists containing elements within set S={0,1}
 def binary_add(A,B):
+    """
+    Sig:    int[0..n-1], int[0..n-1] ==> int[0..n-1+amount]
+    Pre: A and B must only contain elements within set S={0,1}
+    Post: Sum of A and B in base 2
+    Example:    binary_add([0,1],[0,1]) = [1,0]
+    """
     A = ''.join(str(e) for e in A)
     B = ''.join(str(e) for e in B)
     bin_sum = bin(int(A,2)+int(B,2))
@@ -21,86 +26,75 @@ def binary_add(A,B):
 
 
 def binary_shift(A, amount):
-    for i in range(amount): A.append(0)
+    """
+    Sig:    int[0..n-1], int ==> int[0..n-1+amount]
+    Pre: (none)
+    Post: A appended with amount 0's
+    Example:    binary_shift([0,1],2) = [0,1,0,0]
+    """
+    for i in range(amount):
+        # Variant: amount - i
+        A.append(0)
     return (A)
 
 def binary_mult(A,B):
     """
     Sig:    int[0..n-1], int[0..n-1] ==> int[0..2*n-1]
-    Pre:
-    Post:
-    Var:
+    Pre: (none)
+    Post: Product of A and B in base 2
+    Var: Number of elements in A and B
     Example:    binary_mult([0,1,1],[1,0,0]) = [0,0,1,1,0,0]
     """
-    n = len(A)
 
-    if len(A)==1 and len(B)==1:
+    #Boolean describing if original input lists A or B
+    #have been modified in order to ensure that output product
+    #is equal to 2*len(A)
+    added = False
+
+    if len(A)==1 & len(B)==1:
+        #Recursion limit reached
         return ([A[0]*B[0]])
 
-
+    #If input lists A or B were not a power of 2, prepend a 0
     if len(A)%2 != 0:
         A.insert(0,0)
+        added=True
     if len(B)%2 != 0:
         B.insert(0,0)
+        added=True
 
+    input_size=len(A)
 
-    Al = A[0:(len(A)/2)]
-    Ar = A[(len(A)/2):len(A)]
+    al = A[0:(input_size/2)]
+    ar = A[(input_size/2):input_size]
 
-    Bl = B[0:(len(B)/2)]
-    Br = B[(len(B)/2):len(B)]
+    bl = B[0:(input_size/2)]
+    br = B[(input_size/2):input_size]
 
-    a = binary_mult(Al,Bl)
-    b = binary_mult(Al,Br)
-    c = binary_mult(Ar,Bl)
-    d = binary_mult(Ar,Br)
+    a = binary_mult(al,bl)
+    b = binary_mult(al,br)
+    c = binary_mult(ar,bl)
+    d = binary_mult(ar,br)
 
-    x = binary_shift(a, n)
-    y = binary_shift(binary_add(b,c), n/2)
+    x = binary_shift(a, input_size)
+    y = binary_shift(binary_add(b,c), input_size/2)
 
-    result = (binary_add(binary_add(x,y), d))
+    product = (binary_add(binary_add(x,y), d))
 
-    #Make length of result 2*n
-    while len(result)<2*n:
-        result.insert(0,0)
-    while len(result)>2*n:
-        del result[0]#KNASSS
-    return result
+    #If input lists A or B were not originally a power of 2 and were modified,
+    #undo the modification for satisfying that output is of size 2*input_size
+    if added:
+        input_size=input_size-1
 
+    #Make length of product 2*input_size
+    if len(product)!=2*input_size:
+        if len(product)>2*input_size:
+            while len(product)!=2*input_size:
+                # Variant:  len(product) - 2*input_size
+                del product[0]
+        elif len(product)<2*input_size:
+            while len(product)!=2*input_size:
+                # Variant:  2*input_size - len(product)
+                product.insert(0,0)
 
-class BinaryMultTest(unittest.TestCase):
-    """Test Suite for binary multiplication problem
-
-    Any method named "test_something" will be run when this file is
-    executed. Use the sanity check as a template for adding your own
-    tests if you wish.
-    (You may delete this class from your submitted solution.)
-    """
-
-    def test_sanity(self):
-        """Sanity Test
-
-        This is a simple sanity check for your function;
-        passing is not a guarantee of correctness.
-        """
-        A = [0,1,1,0]
-        B = [0,0,1,0]
-
-        answer = binary_mult(A, B)
-        self.assertEqual(answer, [0,0,0,0,1,1,0,0])
-    def test_sanity_uneven(self):
-        """Sanity Test
-
-        This is a simple sanity check for your function;
-        passing is not a guarantee of correctness.
-        """
-        A = [1, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1]
-        B = [0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1]
-        answer = binary_mult(A, B)
-        #DENNA E KNAS
-        #self.assertEqual(answer, [0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1])
-
-
-
-if __name__ == '__main__':
-    unittest.main()
+    return product

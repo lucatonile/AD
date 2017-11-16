@@ -4,50 +4,37 @@
 Assignment 1: Integer Sort
 
 Team Number: 100
-Student Names: Meriton Bytyqi & Lucas Herrera
+Student Names: Lucas Herrera, Meriton Bytyqi
 '''
 import unittest
 
 def integer_sort(A, k):
     '''
     Sig: int array[1..n], int -> int array[1..n]
-    Pre:
-    Post:
+    Pre: k must be value of highest element in A
+    Post: A[1..n] is a non-decreasingly ordered permutation of its original elements
     Example: integer_sort([5, 3, 6, 7, 12, 3, 6, 1, 4, 7]), 12) =
                  [1, 3, 3, 4, 5, 6, 6, 7, 7, 12]
     '''
-# Creates an auxiliary integer array Y [0..k] and initialise it with zeros.
+    # Initialize the auxilliary integer array, Y
+    # Type: Int[0..k]
     Y = [0]*(k+1)
-# Scans A for all indices i: if A[i] = x, then increments Y [x] by 1.
+
+    #Scan A for all indices i: if A[i] = x, then increment Y[x] by 1.
     for i in range(0, len(A)):
+        # Variant:  len(A) - i
         Y[A[i]] = Y[A[i]]+1
-    A = []
-# Scans Y for all indices x: if Y [x] = t > 0, then records value x a total of t times into A. 
+
+    #Empty A
+    del A[:]
+
+    #Scan Y for all indices x:
+    #if Y[x] = t > 0, then record value x a total of t times into A
     for x in range(0, k+1):
+        # Variant:  (k+1) - x
         if Y[x] > 0:
-            for i in xrange(Y[x]):
+            for i in range(Y[x]):
+                # Variant:  Y[x] - i
+                # Append value x into A
                 A.append(x)
-# Returns A
     return(A)
-
-class IntegerSortTest(unittest.TestCase):
-    """Test Suite for integer sort problem
-
-    Any method named "test_something" will be run when this file is
-    executed. Use the sanity check as a template for adding your own
-    tests if you wish.
-    (You may delete this class from your submitted solution.)
-    """
-
-    def test_sanity(self):
-        """Sanity Test
-
-        This is a simple sanity check for your function;
-        passing is not a guarantee of correctness.
-        """
-        A = [5, 3, 6, 7, 12, 3, 6, 1, 4, 7]
-        R = integer_sort(A, 12)
-        self.assertEqual(R, [1, 3, 3, 4, 5, 6, 6, 7, 7, 12])
-
-if __name__ == '__main__':
-    unittest.main()

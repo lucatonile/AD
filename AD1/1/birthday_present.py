@@ -3,16 +3,18 @@
 '''
 Assignment 1: Birthday Present
 
-Team Number:
-Student Names:
+Team Number: 100
+Student Names: Lucas Herrera, Meriton Bytyqi
 '''
 import unittest
 
 def birthday_present(P, n, t):
     '''
     Sig: int[0..n-1], int, int --> Boolean
-    Pre:
-    Post:
+    Pre: n must be equal to the length of P,
+         t must be a non-negative integer
+    Post: True if there exists solution to given birthday problem,
+          False otherwise
     Example: P = [2, 32, 234, 35, 12332, 1, 7, 56]
              birthday_present(P, len(P), 299) = True
              birthday_present(P, len(P), 11) = False
@@ -21,25 +23,37 @@ def birthday_present(P, n, t):
     # Type: Int[0..n][0..t]
     A = [[None for i in range(t + 1)] for j in range(n + 1)]
 
+    #Set all values of the first column of A to 0
     for i in range(n+1):
+        # Variant:  (n+1) - i
         A[i][0] = 0
-    for i in range(t+1):
-        A[0][i] = 0
 
-    for r in range(1, n+1):
-        for c in range(1, t+1):
-            #Fel! A[r][c] ska vara weight[r]. sum(P[0:r])?
-            if P[r-1] > c:
-                A[r][c] = A[r-1][c]
-            elif P[r-1] <= c:
-                A[r][c] = max(P[r-1]+A[r-1][c-P[r-1]], A[r-1][c])
+    #Iterate through every element of A and calculate
+    #the sum of optimally picked prices from P given current price limit (p).
+    #Store the results in A.
+    for i in range(0, n+1):
+        # Variant:  (n+1) - i
+        for p in range(0, t+1):
+            # Variant: (t+1) - p
+            if i == 0:
+                A[i][p] = 0
+            elif P[i-1] > p:
+                A[i][p] = A[i-1][p]
+            elif P[i-1] <= p:
+                A[i][p] = max(P[i-1]+A[i-1][p-P[i-1]], A[i-1][p])
 
-    return (A[-1][-1]==t)
+    #If A[n][t] = t, there exists a subset P' of P
+    #that contains prices with a total sum of t.
+    #Return True in that case, else False.
+    return (A[n][t]==t)
 def birthday_present_subset(P, n, t):
     '''
     Sig: int[0..n-1], int, int --> int[0..m]
-    Pre:
-    Post:
+    Pre: Pre: n must be equal to the length of P,
+              t must be a non-negative integer
+    Post: List of prices in P that sum up to exactly t
+          if there exists solution to given birthday problem,
+          [] otherwise
     Example: P = [2, 32, 234, 35, 12332, 1, 7, 56]
              birthday_present_subset(P, len(P), 299) = [56, 7, 234, 2]
              birthday_present_subset(P, len(P), 11) = []
@@ -48,72 +62,40 @@ def birthday_present_subset(P, n, t):
     # Type: Int[0..n][0..t]
     A = [[None for i in range(t + 1)] for j in range(n + 1)]
 
+    #Set all values of the first column of A to 0
     for i in range(n+1):
+        # Variant:  (n+1) - i
         A[i][0] = 0
-    for i in range(t+1):
-        A[0][i] = 0
 
-    for r in range(1, n+1):
-        for c in range(1, t+1):
-            #val[i]=weight[i]
-            if P[r-1] > c:
-                A[r][c] = A[r-1][c]
-            elif P[r-1] <= c:
-                A[r][c] = max(P[r-1]+A[r-1][c-P[r-1]], A[r-1][c])
+    #Iterate through every element of A and calculate
+    #the sum of optimally picked prices from P given current price limit (p).
+    #Store the results in A.
+    for i in range(0, n+1):
+        # Variant:  (n+1) - i
+        for p in range(0, t+1):
+            # Variant: (t+1) - p
+            if i == 0:
+                A[i][p] = 0
+            elif P[i-1] > p:
+                A[i][p] = A[i-1][p]
+            elif P[i-1] <= p:
+                A[i][p] = max(P[i-1]+A[i-1][p-P[i-1]], A[i-1][p])
 
+    #Initialize the subset P'
+    #Type: Int[]
     P_ = []
-    if A[-1][-1] == t:
-        c = t
-        for r in range(n,-1,-1):
-            if r == 0:
+
+    #If there exists a subset P' of P
+    #whose sum is exactly equal to t,
+    #insert the prices of this subset into P_
+    if A[n][t] == t:
+        #Let p denote the current price limit
+        p = t
+        for i in range(n,-1,-1):
+            # Variant: i
+            if i == 0:
                 break
-            if A[r-1][c] < A[r][c]:
-                P_.append(P[r-1])
-                c = c-P[r-1]
+            if A[i-1][p] < A[i][p]:
+                P_.append(P[i-1])
+                p = p-P[i-1]
     return (P_)
-
-
-class BirthdayPresentTest(unittest.TestCase):
-    """Test Suite for birthday present problem
-
-    Any method named "test_something" will be run when this file is
-    executed. Use the sanity check as a template for adding your own
-    tests if you wish.
-    (You may delete this class from your submitted solution.)
-    """
-    def test_sat_sanity_ez(self):
-        """Sanity Test for birthday_present()
-
-        This is a simple sanity check;
-        passing is not a guarantee of correctness.
-        """
-        P = [1,5,6]
-        n = len(P)
-        t = 11
-        #self.assertTrue(birthday_present(P, n, t))
-    def test_sat_sanity(self):
-        """Sanity Test for birthday_present()
-
-        This is a simple sanity check;
-        passing is not a guarantee of correctness.
-        """
-        P = [2,9,32, 234, 35, 12332, 1, 7, 56]
-        n = len(P)
-        t = 33
-        #self.assertTrue(birthday_present(P, n, t))
-    def test_sol_sanity(self):
-        """Sanity Test for birthday_present_subset()
-
-        This is a simple sanity check;
-        passing is not a guarantee of correctness.
-        """
-        P = [2, 32, 234, 35, 12332, 1, 7, 56]
-        n = len(P)
-        t = 299
-        self.assertTrue(birthday_present(P, n, t))
-        self.assertItemsEqual(birthday_present_subset(P, n, t),
-                              [56, 7, 234, 2])
-
-
-if __name__ == '__main__':
-    unittest.main()
