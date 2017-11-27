@@ -36,11 +36,8 @@ def min_difference(u,r,R):
         # Variant:  (n+1) - i
         A[0][i] = A[0][i-1] + R['-'][r[i-1]]
 
-    ops=[[0 for i in range(len(r)+1)] for j in range(len(u)+1)]
-
     for i in range(1, len(u)+1):
         # Variant:  (n+1) - i
-
         for j in range(1, len(r)+1):
             #Get value of min-cost operation
             A[i][j]= min(A[i-1][j] + R[u[i-1]]['-'],
@@ -79,8 +76,8 @@ def min_difference_align(u,r,R):
         # Variant:  (n+1) - i
         for j in range(1, len(r)+1):
             #Save min-cost operation for backtrace.
-            op = {'u_skip': A[i-1][j] + R[u[i-1]]['-'],
-                'r_skip': A[i][j-1] + R['-'][r[j-1]],
+            op = {'r_skip': A[i-1][j] + R[u[i-1]]['-'],
+                'u_skip': A[i][j-1] + R['-'][r[j-1]],
                 'u_alter': A[i-1][j-1] + R[u[i-1]][r[j-1]]}
             #Get value of min-cost operation
             A[i][j]= min(op.itervalues())
@@ -90,29 +87,39 @@ def min_difference_align(u,r,R):
 
     u_ = ""
     r_ = ""
-    j = len(r)+1
+    j = len(r)
 
     #Backtrace
-    for i in range(len(u)+1,-1,-1):
-        if i == 0:
+    for i in range(len(u),-1,-1):
+        if ops[i][j] != 'u_skip':
+            print(i,j)
+            print(ops[i][j])
+
+        if i==0 & j==0:
             break
+        u_sub = u[i-1]
+        r_sub = r[j-1]
 
-        u_sub = ""
-        r_sub = ""
-        if ops[i][j]=='u_skip':
-            u_sub = u[i-1]+"-"
         if ops[i][j]=='r_skip':
-            r_sub = r[i]
-            while ops[i][j]=='r_skip':
-                r_sub += '-'
+            r_sub +="-"
+        elif ops[i][j]=='u_skip':
+            j_old = j
+            while ops[i][j]=='u_skip':
+                print("---loop---")
+                print(i,j)
+                print(ops[i][j])
+                print("---loop---")
+                u_sub += '-'
                 j-=1
-        if ops[i][j]=='u_alter':
-            u_sub = u[i-1]
-            r_sub = r[i-1]
+            r_sub = r[j:j_old]
+        elif ops[i][j]=='u_alter':
             j-=1
-
-
-        print(i)
+        print("LOL")
+        print(i,j)
+        print(ops[i][j])
+        u_ = u_sub+u_
+        r_ = r_sub+r_
+    print(r_)
     return A[-1][-1], u_, r_
 def qwerty_distance():
     """Generates a QWERTY Manhattan distance resemblance matrix
