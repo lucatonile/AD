@@ -71,6 +71,13 @@ def min_difference_align(u,r,R):
         A[0][i] = A[0][i-1] + R['-'][r[i-1]]
 
     ops=[[0 for i in range(len(r)+1)] for j in range(len(u)+1)]
+    for i in range(1,len(u)+1):
+        # Variant:  (n+1) - i
+        ops[i][0] = 'r_skip'
+
+    for i in range(1,len(r)+1):
+        # Variant:  (n+1) - i
+        ops[0][i] = 'u_skip'
 
     for i in range(1, len(u)+1):
         # Variant:  (n+1) - i
@@ -83,43 +90,39 @@ def min_difference_align(u,r,R):
             A[i][j]= min(op.itervalues())
 
             ops[i][j]=(min(op,key=op.get))
-    print(ops)
 
+    i = len(u)-1
+    j = len(r)-1
+    path = []
+    #Backtrace
+    while i+j!=0:
+        path.insert(0,ops[i][j])
+        if ops[i][j]=='r_skip':
+            i-=1
+        elif ops[i][j]=='u_skip':
+            j-=1
+        elif ops[i][j]=='u_alter':
+            i-=1
+            j-=1
+        print(i,j)
+    print(path)
+
+    #Construct alignment strings
     u_ = ""
     r_ = ""
-    j = len(r)
+    i = 0
+    j = 0
+    for op in path:
 
-    #Backtrace
-    for i in range(len(u),-1,-1):
-        if ops[i][j] != 'u_skip':
-            print(i,j)
-            print(ops[i][j])
+        if op=='r_skip':
+            u_ += u[i]
+            i+=1
+        elif op=='u_skip':
+            u_sub += '-'
+        elif op=='u_alter':
+            u_ += u[i]
+            i+=1
 
-        if i==0 & j==0:
-            break
-        u_sub = u[i-1]
-        r_sub = r[j-1]
-
-        if ops[i][j]=='r_skip':
-            r_sub +="-"
-        elif ops[i][j]=='u_skip':
-            j_old = j
-            while ops[i][j]=='u_skip':
-                print("---loop---")
-                print(i,j)
-                print(ops[i][j])
-                print("---loop---")
-                u_sub += '-'
-                j-=1
-            r_sub = r[j:j_old]
-        elif ops[i][j]=='u_alter':
-            j-=1
-        print("LOL")
-        print(i,j)
-        print(ops[i][j])
-        u_ = u_sub+u_
-        r_ = r_sub+r_
-    print(r_)
     return A[-1][-1], u_, r_
 def qwerty_distance():
     """Generates a QWERTY Manhattan distance resemblance matrix
