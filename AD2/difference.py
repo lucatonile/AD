@@ -28,14 +28,18 @@ def min_difference(u,r,R):
 
     #Set all values of the first column of A to 0
     A[0][0]=0
+
+    #Initialize every element in column 0 of the dynamic programming matrix.
     for i in range(1,len(u)+1):
-        # Variant:  (n+1) - i
+        # Variant:  (u+1) - i
         A[i][0] = A[i-1][0] + R[u[i-1]]['-']
 
+    #Initialize every element in row 0 of the dynamic programming matrix.
     for i in range(1,len(r)+1):
-        # Variant:  (n+1) - i
+        # Variant:  (r+1) - i
         A[0][i] = A[0][i-1] + R['-'][r[i-1]]
 
+    #Compute dynamic programming matrix
     for i in range(1, len(u)+1):
         # Variant:  (n+1) - i
         for j in range(1, len(r)+1):
@@ -56,29 +60,46 @@ def min_difference_align(u,r,R):
                                     3, "dinam-ck", "dynamic-"
     """
 
+    #Alignment strings
+    u_ = ""
+    r_ = ""
+
+    #List containing optimal operations performed in order to achieve alignment
+    path = []
+
+    # Initialize the operation matrix. Every element describes operation performed
+    # in dynamic programming matrix
+    # Type: Str[0..n][0..t]
+    ops=[['' for i in range(len(r)+1)] for j in range(len(u)+1)]
+
     # Initialize the dynamic programming matrix, A
     # Type: Int[0..n][0..t]
     A = [[None for i in range(len(r)+1)] for j in range(len(u)+1)]
 
     #Set all values of the first column of A to 0
     A[0][0]=0
+
+    #Initialize every element in column 0 of the dynamic programming matrix.
     for i in range(1,len(u)+1):
-        # Variant:  (n+1) - i
+        # Variant:  (u+1) - i
         A[i][0] = A[i-1][0] + R[u[i-1]]['-']
 
+    #Initialize every element in row 0 of the dynamic programming matrix.
     for i in range(1,len(r)+1):
-        # Variant:  (n+1) - i
+        # Variant:  (r+1) - i
         A[0][i] = A[0][i-1] + R['-'][r[i-1]]
 
-    ops=[[0 for i in range(len(r)+1)] for j in range(len(u)+1)]
+    #Initialize every element in column 0 of the operations matrix.
     for i in range(1,len(u)+1):
         # Variant:  (n+1) - i
         ops[i][0] = 'r_skip'
 
+    #Initialize every element in row 0 of the operations matrix.
     for i in range(1,len(r)+1):
         # Variant:  (n+1) - i
         ops[0][i] = 'u_skip'
 
+    #Compute dynamic programming matrix
     for i in range(1, len(u)+1):
         # Variant:  (n+1) - i
         for j in range(1, len(r)+1):
@@ -91,11 +112,12 @@ def min_difference_align(u,r,R):
 
             ops[i][j]=(min(op,key=op.get))
 
-    i = len(u)-1
-    j = len(r)-1
-    path = []
-    #Backtrace
+    #Backtrace in dunamic programming matrix to retrieve optimal path
+    i = len(u)
+    j = len(r)
+
     while i+j!=0:
+        print(i,j)
         path.insert(0,ops[i][j])
         if ops[i][j]=='r_skip':
             i-=1
@@ -104,25 +126,24 @@ def min_difference_align(u,r,R):
         elif ops[i][j]=='u_alter':
             i-=1
             j-=1
-        print(i,j)
-    print(path)
 
     #Construct alignment strings
-    u_ = ""
-    r_ = ""
     i = 0
     j = 0
     for op in path:
-
         if op=='r_skip':
-            u_ += u[i]
+            u_+=u[i]
+            r_+='-'
             i+=1
         elif op=='u_skip':
-            u_sub += '-'
+            u_ += '-'
+            r_ += r[j]
+            j+=1
         elif op=='u_alter':
-            u_ += u[i]
+            u_+=u[i]
+            r_+=r[j]
             i+=1
-
+            j+=1
     return A[-1][-1], u_, r_
 def qwerty_distance():
     """Generates a QWERTY Manhattan distance resemblance matrix
