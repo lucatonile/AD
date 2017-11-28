@@ -28,11 +28,32 @@ def ring(G):
     Sig: graph G(node,edge) ==> boolean
     Pre:
     Post:
-    Example: 
+    Example:
         ring(g1) ==> False
         ring(g2) ==> True
     """
-            
+    visited=[]
+    tovisit=[G.nodes()[0]]
+    camefrom = 0
+
+    while len(tovisit)!=0:
+
+        node = tovisit.pop()
+        if camefrom not in G.neighbors(node):
+            if camefrom!=node:
+                camefrom = nx.shortest_path(G,source=camefrom,target=node)[-2]
+
+        if node not in visited:
+            visited.append(node)
+            for neighbor in G.neighbors(node):
+                if neighbor!=camefrom and neighbor in visited:
+                    return(True)
+                tovisit.append(neighbor)
+
+            camefrom = node
+
+
+    return False
 
 
 def ring_extended(G):
@@ -40,12 +61,12 @@ def ring_extended(G):
     Sig: graph G(node,edge) ==> boolean, int[0..j-1]
     Pre:
     Post:
-    Example: 
+    Example:
         ring(g1) ==> False, []
         ring(g2) ==>  True, [3,7,8,6,3]
     """
-    
-    
+
+
 def draw_graph(G,r):
     """Draw graph and the detected ring
     """
@@ -56,7 +77,7 @@ def draw_graph(G,r):
     nx.draw_networkx_nodes(G,pos)
     nx.draw_networkx_edges(G,pos,style='dotted') # graph edges drawn with dotted lines
     nx.draw_networkx_labels(G,pos)
-    
+
     # add solid edges for the detected ring
     if len(r) > 0:
         T = nx.Graph()
@@ -67,16 +88,16 @@ def draw_graph(G,r):
             else:
                 T.edge[a][b]['color']='r' # red edges are in the ring, but not in the graph
         nx.draw_networkx_edges(
-            T,pos, 
-            edge_color=[edata['color'] for (a,b,edata) in T.edges(data=True)], 
+            T,pos,
+            edge_color=[edata['color'] for (a,b,edata) in T.edges(data=True)],
             width=4)
     plt.show()
-    
+
 class RingTest(unittest.TestCase):
     """Test Suite for ring detection problem
-    
-    Any method named "test_something" will be run when this file is 
-    executed. Use the sanity check as a template for adding your own test 
+
+    Any method named "test_something" will be run when this file is
+    executed. Use the sanity check as a template for adding your own test
     cases if you wish.
     (You may delete this class from your submitted solution.)
     """
@@ -85,24 +106,24 @@ class RingTest(unittest.TestCase):
         traversed = nx.Graph()
         for v in range(len(path) - 1):
             self.assertTrue(
-                path[v + 1] in graph.neighbors(path[v]), 
+                path[v + 1] in graph.neighbors(path[v]),
                 "({},{}) is not an edge in the graph\ngraph: {}".format(
                     path[v],
                     path[v+1],
                     graph.edges())
                     )
             self.assertFalse(
-                traversed.has_edge(path[v],path[v+1]), 
+                traversed.has_edge(path[v],path[v+1]),
                 "duplicated edge: ({},{})".format(path[v],path[v+1]))
             traversed.add_edge(path[v],path[v+1])
         self.assertEqual(
-            path[0], path[-1], 
+            path[0], path[-1],
             "start and end not equal: {} != {}".format(path[0],path[-1]))
-            
-        
+
+
     def test_sanity(self):
         """Sanity Test
-        
+
         This is a simple sanity check for your function;
         passing is not a guarantee of correctness.
         """
@@ -110,15 +131,15 @@ class RingTest(unittest.TestCase):
         self.assertFalse(ring(testgraph))
         testgraph.add_edge(6,8)
         self.assertTrue(ring(testgraph))
-        
+
     def test_extended_sanity(self):
         """sanity test for returned ring"""
         testgraph = nx.Graph([(0,1),(0,2),(0,3),(2,4),(2,5),(3,6),(3,7),(7,8),(6,8)])
-        found, thering = ring_extended(testgraph)
-        self.assertTrue(found)
-        self.is_ring(testgraph, thering)
+        #found, thering = ring_extended(testgraph)
+        #self.assertTrue(found)
+        #self.is_ring(testgraph, thering)
         # Uncomment to visualize the graph and returned ring:
-        draw_graph(testgraph,thering)
+        #draw_graph(testgraph,thering)
     @classmethod
     def tearDownClass(cls):
         if HAVE_PLT:
