@@ -109,7 +109,7 @@ def min_difference_align(u,r,R):
                 'u_alter': A[i-1][j-1] + R[u[i-1]][r[j-1]]}
             #Get value of min-cost operation
             A[i][j]= min(op.itervalues())
-
+            #Save operation in operations matrix
             ops[i][j]=(min(op,key=op.get))
 
     #Backtrace in dunamic programming matrix to retrieve optimal path
@@ -117,7 +117,6 @@ def min_difference_align(u,r,R):
     j = len(r)
 
     while i+j!=0:
-        print(i,j)
         path.insert(0,ops[i][j])
         if ops[i][j]=='r_skip':
             i-=1
@@ -145,6 +144,7 @@ def min_difference_align(u,r,R):
             i+=1
             j+=1
     return A[-1][-1], u_, r_
+
 def qwerty_distance():
     """Generates a QWERTY Manhattan distance resemblance matrix
 
