@@ -37,7 +37,6 @@ def ring(G):
     camefrom = 0
 
     while len(tovisit)!=0:
-
         node = tovisit.pop()
         if camefrom not in G.neighbors(node):
             if camefrom!=node:
@@ -48,7 +47,8 @@ def ring(G):
             for neighbor in G.neighbors(node):
                 if neighbor!=camefrom and neighbor in visited:
                     return(True)
-                tovisit.append(neighbor)
+                if neighbor not in visited:
+                    tovisit.append(neighbor)
 
             camefrom = node
 
