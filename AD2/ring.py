@@ -32,25 +32,25 @@ def ring(G):
         ring(g1) ==> False
         ring(g2) ==> True
     """
-    visited=[]
-    tovisit=[G.nodes()[0]]
-    camefrom = 0
-
-    while len(tovisit)!=0:
-        node = tovisit.pop()
-        if camefrom not in G.neighbors(node):
-            if camefrom!=node:
+    
+    for i in range(len(G.nodes())):
+        visited=[]
+        tovisit=[G.nodes()[i],G.nodes()[i]]
+        camefrom = i
+        while len(tovisit)!=0:
+            node = tovisit.pop()
+            if camefrom not in G.neighbors(node) and camefrom!=node:
                 camefrom = nx.shortest_path(G,source=camefrom,target=node)[-2]
 
-        if node not in visited:
-            visited.append(node)
-            for neighbor in G.neighbors(node):
-                if neighbor!=camefrom and neighbor in visited:
-                    return(True)
-                if neighbor not in visited:
-                    tovisit.append(neighbor)
+            if node not in visited:
+                visited.append(node)
+                for neighbor in G.neighbors(node):
+                    if neighbor!=camefrom and neighbor in visited:
+                        return(True)
+                    if neighbor not in visited:
+                        tovisit.append(neighbor)
 
-            camefrom = node
+                camefrom = node
 
 
     return False
