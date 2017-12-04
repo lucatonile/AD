@@ -29,15 +29,15 @@ def min_difference(u,r,R):
     #Set all values of the first column of A to 0
     A[0][0]=0
 
-    #Initialize every element in column 0 of the dynamic programming matrix.
-    for i in range(1,len(u)+1):
-        # Variant:  (u+1) - i
-        A[i][0] = A[i-1][0] + R[u[i-1]]['-']
-
     #Initialize every element in row 0 of the dynamic programming matrix.
     for i in range(1,len(r)+1):
         # Variant:  (r+1) - i
         A[0][i] = A[0][i-1] + R['-'][r[i-1]]
+
+    #Initialize every element in column 0 of the dynamic programming matrix.
+    for i in range(1,len(u)+1):
+        # Variant:  (u+1) - i
+        A[i][0] = A[i-1][0] + R[u[i-1]]['-']
 
     #Compute dynamic programming matrix
     for i in range(1, len(u)+1):

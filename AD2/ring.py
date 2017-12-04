@@ -32,25 +32,23 @@ def ring(G):
         ring(g1) ==> False
         ring(g2) ==> True
     """
-    
+
     for i in range(len(G.nodes())):
         visited=[]
-        tovisit=[G.nodes()[i],G.nodes()[i]]
-        camefrom = i
+        #(node, parent)
+        tovisit=[(G.nodes()[i],G.nodes()[i])]
+
         while len(tovisit)!=0:
             node = tovisit.pop()
-            if camefrom not in G.neighbors(node) and camefrom!=node:
-                camefrom = nx.shortest_path(G,source=camefrom,target=node)[-2]
 
-            if node not in visited:
-                visited.append(node)
-                for neighbor in G.neighbors(node):
-                    if neighbor!=camefrom and neighbor in visited:
+            if node[0] not in visited:
+                visited.append(node[0])
+
+                for neighbor in G.neighbors(node[0]):
+                    if neighbor!=node[1] and neighbor in visited:
                         return(True)
                     if neighbor not in visited:
-                        tovisit.append(neighbor)
-
-                camefrom = node
+                        tovisit.append((neighbor,node[0]))
 
 
     return False
@@ -65,8 +63,40 @@ def ring_extended(G):
         ring(g1) ==> False, []
         ring(g2) ==>  True, [3,7,8,6,3]
     """
+    ringfound = False
+    head = (None,None)
 
+    for i in range(len(G.nodes())):
+        visited=[]
+        #(node, parent)
+        tovisit=[(G.nodes()[i],G.nodes()[i])]
 
+        while len(tovisit)!=0:
+            node = tovisit.pop()
+            if set(node) not in [set(n) for n in visited]:
+                visited.append(node)
+                for neighbor in G.neighbors(node[0]):
+                    if neighbor!=node[1] and (neighbor,node[0]) in visited:
+                        ringfound = True
+                        head = (neighbor,node[0])
+                        tovisit = []
+                        break
+                    if (neighbor,node[0]) not in visited:
+                        tovisit.append((neighbor,node[0]))
+        if ringfound:
+            break
+
+    ring = []
+    if ringfound:
+        v = zip(*visited)[0]
+        i = len(visited)-1
+        ring.append(visited[i][0])
+        while visited[i][0]!=head[0]:
+            ring.append(visited[i][1])
+            i = v.index(visited[i][1])
+        ring.append(head[1])
+
+    return ringfound, ring
 def draw_graph(G,r):
     """Draw graph and the detected ring
     """
@@ -134,10 +164,33 @@ class RingTest(unittest.TestCase):
 
     def test_extended_sanity(self):
         """sanity test for returned ring"""
-        testgraph = nx.Graph([(0,1),(0,2),(0,3),(2,4),(2,5),(3,6),(3,7),(7,8),(6,8)])
-        #found, thering = ring_extended(testgraph)
-        #self.assertTrue(found)
-        #self.is_ring(testgraph, thering)
+        G = nx.Graph();
+        G.add_node(0);
+        G.add_node(1);
+        G.add_node(2);
+        G.add_node(3);
+        G.add_node(4);
+        G.add_node(5);
+        G.add_node(6);
+        G.add_node(7);
+        G.add_node(8);
+        G.add_node(9);
+        G.add_node(10);
+        G.add_edge(3, 6);
+        G.add_edge(6, 7);
+        G.add_edge(1, 4);
+        G.add_edge(1, 10);
+        G.add_edge(5, 9);
+        G.add_edge(4, 6);
+        G.add_edge(3, 9);
+        G.add_edge(6, 10);
+        G.add_edge(1, 10);
+        #nx.draw(G)
+        # Expected output:
+        found, thering = ring_extended(G)
+        self.assertTrue(found)
+        print(thering)
+        self.is_ring(G, thering)
         # Uncomment to visualize the graph and returned ring:
         #draw_graph(testgraph,thering)
     @classmethod
