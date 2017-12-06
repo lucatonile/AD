@@ -60,13 +60,6 @@ def min_difference_align(u,r,R):
                                     3, "dinam-ck", "dynamic-"
     """
 
-    #Alignment strings
-    u_ = ""
-    r_ = ""
-
-    #List containing optimal operations performed in order to achieve alignment
-    path = []
-
     # Initialize the operation matrix. Every element describes operation performed
     # in dynamic programming matrix
     # Type: Str[0..n][0..t]
@@ -113,11 +106,20 @@ def min_difference_align(u,r,R):
             #Save min-cost operation in operations matrix
             ops[i][j]=(min(op,key=op.get))
 
-    #Backtrace in dunamic programming matrix to retrieve optimal path
+    #Backtrack in dunamic programming matrix to retrieve optimal path
     i = len(u)
     j = len(r)
 
+    #Alignment strings
+    u_ = ""
+    r_ = ""
+
+    #List containing optimal operations performed in order to achieve string positioning
+    path = []
+
+    #Construct path
     while i+j!=0:
+        # Variant: len(u)*len(r) - (i+j)
         path.insert(0,ops[i][j])
         if ops[i][j]=='r_skip':
             i-=1
@@ -127,10 +129,11 @@ def min_difference_align(u,r,R):
             i-=1
             j-=1
 
-    #Construct alignment strings
+    #Construct string positionings using path
     i = 0
     j = 0
     for op in path:
+        # Variant: len(path) - path.index(op)
         if op=='r_skip':
             u_+=u[i]
             r_+='-'
