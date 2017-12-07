@@ -184,6 +184,3 @@ def qwerty_distance():
                 if b in contentB:
                     R[a][b] = math.fabs(rowB - rowA) + math.fabs(posA - contentB.index(b))
     return R
-
-if __name__ == '__main__':
-    unittest.main()

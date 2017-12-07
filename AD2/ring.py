@@ -32,48 +32,53 @@ def ring(G):
         ring(g1) ==> False
         ring(g2) ==> True
     """
-    puta=0
     #Nodes to start the DFS from.
-    startnodes = G.nodes()
+    startnodes = set(G.nodes())
 
     allvisited = set([])
 
     while len(allvisited)!=len(G.nodes()):
         # Variant: len(G.nodes()) - len(allvisited)
-
-        #Remove nodes that have been visited from startnodes since performing dfs
-        #on them would be redundant
-        startnodes = [e for e in startnodes if e not in allvisited]
-        startnode = startnodes[0]
+        startnode = startnodes.pop()
 
         #If start node is not connected to any other nodes, go to next iteration.
         if len(G.neighbors(startnode))==0:
             allvisited.add(startnode)
             continue
 
-        visited=[]
+        #Reset visited and tovisit
+        visited= {}
         tovisit=[(startnode,startnode)]
+
         while len(tovisit)!=0:
             # Variant: len(tovisit)
             node = tovisit.pop()
-            if set(node) not in [set(n) for n in visited]:
-                visited.append(node)
+            #-1 is set as default value for visited.get(), i.e. visited.get(node)==-1
+            #means node was not found in visited
+            if (visited.get(node[0], -1)==-1) or (visited.get(node[1], -1)==-1):
+                visited[node[0]] = node[1]
+                allvisited.add(node[0])
+                #Remove nodes that have been visited from startnodes since performing dfs
+                #on them would be redundant
+                startnodes.discard(node[0])
                 for neighbor in G.neighbors(node[0]):
                     # Variant: len(G.neighbors(node[0])) - G.neighbors(node[0]).index(neighbor)
-                    if neighbor!=node[1] and (neighbor,node[0]) in visited:
-                        return True
-                    if (neighbor,node[0]) not in visited:
+                    if neighbor!=node[1] and (visited.get(neighbor, -1)!=-1):
+                        ringfound = True
+                        head = (neighbor,node[0])
+                        #Break outer loop
+                        tovisit = []
+                        #Break inner loop
+                        break
+                    if visited.get(neighbor, -1)==-1:
                         tovisit.append((neighbor,node[0]))
-
-        #Insert visited nodes using current startnode into allvisited
-        allvisited.update(zip(*visited)[0])
     return False
 
 
 def ring_extended(G):
     """
     Sig: graph G(node,edge) ==> boolean, int[0..j-1]
-    Pre: 
+    Pre:
     Post:
     Example:
         ring(g1) ==> False, []
@@ -86,61 +91,61 @@ def ring_extended(G):
     head = (None,None)
 
     #Nodes to start the DFS from.
-    startnodes = G.nodes()
+    startnodes = set(G.nodes())
+
     allvisited = set([])
 
     while len(allvisited)!=len(G.nodes()):
         # Variant: len(G.nodes()) - len(allvisited)
-
-        #Remove nodes that have been visited from startnodes since performing dfs
-        #on them would be redundant
-        startnodes = [e for e in startnodes if e not in allvisited]
-        startnode = startnodes[0]
+        startnode = startnodes.pop()
 
         #If start node is not connected to any other nodes, go to next iteration.
         if len(G.neighbors(startnode))==0:
             allvisited.add(startnode)
             continue
 
-        visited=[]
+        #Reset visited and tovisit
+        visited= {}
         tovisit=[(startnode,startnode)]
 
         while len(tovisit)!=0:
             # Variant: len(tovisit)
             node = tovisit.pop()
-            if set(node) not in [set(n) for n in visited]:
-                visited.append(node)
+            #-1 is set as default value for visited.get(), i.e. visited.get(node)==-1
+            #means node was not found in visited
+            if (visited.get(node[0], -1)==-1) or (visited.get(node[1], -1)==-1):
+                visited[node[0]] = node[1]
+                allvisited.add(node[0])
+                #Remove nodes that have been visited from startnodes since performing dfs
+                #on them would be redundant
+                startnodes.discard(node[0])
                 for neighbor in G.neighbors(node[0]):
                     # Variant: len(G.neighbors(node[0])) - G.neighbors(node[0]).index(neighbor)
-                    if neighbor!=node[1] and (neighbor,node[0]) in visited:
+                    if neighbor!=node[1] and (visited.get(neighbor, -1)!=-1):
                         ringfound = True
                         head = (neighbor,node[0])
                         #Break outer loop
                         tovisit = []
                         #Break inner loop
                         break
-                    if (neighbor,node[0]) not in visited:
+                    if visited.get(neighbor, -1)==-1:
                         tovisit.append((neighbor,node[0]))
         #Break loop if ring has been found
         if ringfound:
             break
 
-        #Insert visited nodes using current startnode into allvisited
-        allvisited.update(zip(*visited)[0])
-
     #Obtain list of nodes in ring if one was found
     ring = []
     if ringfound:
-        v = zip(*visited)[0]
-        i = len(visited)-1
-        ring.append(visited[i][0])
-        while visited[i][0]!=head[0]:
+        ring.extend(head)
+        node = ring[-1]
+        while node!=head[0]:
             # Variant: len(visited)-len(ring)
-            ring.append(visited[i][1])
-            i = v.index(visited[i][1])
-        ring.append(head[1])
+            ring.append(visited[node])
+            node = ring[-1]
 
     return ringfound, ring
+
 def draw_graph(G,r):
     """Draw graph and the detected ring
     """
@@ -166,59 +171,3 @@ def draw_graph(G,r):
             edge_color=[edata['color'] for (a,b,edata) in T.edges(data=True)],
             width=4)
     plt.show()
-
-class RingTest(unittest.TestCase):
-    """Test Suite for ring detection problem
-
-    Any method named "test_something" will be run when this file is
-    executed. Use the sanity check as a template for adding your own test
-    cases if you wish.
-    (You may delete this class from your submitted solution.)
-    """
-    def is_ring(self, graph, path):
-        """Asserts that the nodes in path from a ring in graph"""
-        traversed = nx.Graph()
-        for v in range(len(path) - 1):
-            self.assertTrue(
-                path[v + 1] in graph.neighbors(path[v]),
-                "({},{}) is not an edge in the graph\ngraph: {}".format(
-                    path[v],
-                    path[v+1],
-                    graph.edges())
-                    )
-            self.assertFalse(
-                traversed.has_edge(path[v],path[v+1]),
-                "duplicated edge: ({},{})".format(path[v],path[v+1]))
-            traversed.add_edge(path[v],path[v+1])
-        self.assertEqual(
-            path[0], path[-1],
-            "start and end not equal: {} != {}".format(path[0],path[-1]))
-
-
-    def test_sanity(self):
-        """Sanity Test
-
-        This is a simple sanity check for your function;
-        passing is not a guarantee of correctness.
-        """
-        testgraph = nx.Graph([(0,1),(0,2),(0,3),(2,4),(2,5),(3,6),(3,7),(7,8)])
-        print(len(testgraph.nodes()))
-        #self.assertFalse(ring(testgraph))
-        #testgraph.add_edge(6,8)
-        #print(len(testgraph.nodes()))
-        #self.assertTrue(ring(testgraph))
-
-    def test_extended_sanity(self):
-        """sanity test for returned ring"""
-        testgraph = nx.Graph([(0,1),(0,2),(0,3),(2,4),(2,5),(3,6),(3,7),(7,8),(6,8),(True,'a')])
-        found, thering = ring_extended(testgraph)
-        self.assertTrue(found)
-        self.is_ring(testgraph, thering)
-        # Uncomment to visualize the graph and returned ring:
-        #draw_graph(testgraph,thering)
-    @classmethod
-    def tearDownClass(cls):
-        if HAVE_PLT:
-            plt.show()
-if __name__ == '__main__':
-    unittest.main()
