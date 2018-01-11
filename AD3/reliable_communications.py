@@ -66,6 +66,7 @@ class PriorityQueue:
 
         raise KeyError('pop from an empty priority queue')
 
+    """Auxiliary Functions"""
     def get_priority(self, task):
         """
         Sig: integer ==> integer
@@ -115,8 +116,11 @@ def reliable(G, s, t):
         # Variant: tovisit.length()
         node = tovisit.pop_task()
         for neighbor in G.neighbors(node):
-            #log(1-failprobability) to convert product to sum
-            l = pi[node] - math.log(1-G[node][neighbor]['fp'])
+            #Avoid log(0)
+            if G[node][neighbor]['fp']<1:
+                l = pi[node] - math.log(1-G[node][neighbor]['fp'])
+            elif G[node][neighbor]['fp']==1:
+                l = 0
             if pi[neighbor] > l:
                 tovisit.add_task(neighbor, l)
                 pi[neighbor] = l

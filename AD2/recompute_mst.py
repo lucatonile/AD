@@ -156,6 +156,3 @@ def update_MST_4(G, T, e, w):
     """
     (u, v) = e
     assert(e in G.edges() and e in T.edges() and w > G[u][v]['weight'])
-
-if __name__ == '__main__':
-    unittest.main()

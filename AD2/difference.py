@@ -97,7 +97,7 @@ def min_difference_align(u,r,R):
         # Variant:  (u+1) - i
         for j in range(1, len(r)+1):
             # Variant:  (r+1) - i
-            #Save min-cost operation for backtrace.
+            #Save min-cost operation for backtrack.
             op = {'r_skip': A[i-1][j] + R[u[i-1]]['-'],
                 'u_skip': A[i][j-1] + R['-'][r[j-1]],
                 'u_alter': A[i-1][j-1] + R[u[i-1]][r[j-1]]}

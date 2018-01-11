@@ -64,12 +64,7 @@ def ring(G):
                 for neighbor in G.neighbors(node[0]):
                     # Variant: len(G.neighbors(node[0])) - G.neighbors(node[0]).index(neighbor)
                     if neighbor!=node[1] and (visited.get(neighbor, -1)!=-1):
-                        ringfound = True
-                        head = (neighbor,node[0])
-                        #Break outer loop
-                        tovisit = []
-                        #Break inner loop
-                        break
+                        return True
                     if visited.get(neighbor, -1)==-1:
                         tovisit.append((neighbor,node[0]))
     return False
